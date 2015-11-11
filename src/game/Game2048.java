@@ -2,6 +2,7 @@ package game;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Random;
 
@@ -14,11 +15,23 @@ public class Game2048 extends Observable implements KeyListener
 	private TerminalPanel terminal;
 	private int initialSize;
 	private int randomValues;
+	private boolean checkTyped = true; private boolean enabledInput = true;
+	private int score;
 	public Game2048(TerminalPanel terminal,int initialSize, int randomValues)
 	{
+		
 		this.terminal = terminal;
 		this.initialSize = initialSize;
 		this.randomValues = randomValues;
+		score = 0;
+	}
+	public boolean isEnabled()
+	{
+		return enabledInput;
+	}
+	public void enableInput(boolean value)
+	{
+		enabledInput = value;
 	}
 	public int getSize()
 	{
@@ -66,15 +79,16 @@ public class Game2048 extends Observable implements KeyListener
 				int currentColumn = j;
 				for(int u = j + 1; u < initialSize; u++)
 				{
-					if(table[i][currentColumn] == table[i][u])
+					if(table[i][currentColumn].equals(table[i][u]))
 					{
 						table[i][currentColumn] = 0;
 						table[i][u] *= 2;
+						score += table[i][u].intValue();
 						entries[i][u] = true;
 						entries[i][currentColumn] = false;
 					}
 					else
-					if(table[i][u] == 0)
+					if(table[i][u].equals(new Integer(0)))
 					{
 						table[i][u] = table[i][currentColumn];
 						table[i][currentColumn] = 0;
@@ -102,15 +116,16 @@ public class Game2048 extends Observable implements KeyListener
 				int currentColumn = j;
 				for(int u = j - 1; u >= 0; u--)
 				{
-					if(table[i][currentColumn] == table[i][u])
+					if(table[i][currentColumn].equals(table[i][u]))
 					{
 						table[i][currentColumn] = 0;
 						table[i][u] *= 2;
+						score += table[i][u].intValue();
 						entries[i][u] = true;
 						entries[i][currentColumn] = false;
 					}
 					else
-					if(table[i][u] == 0)
+					if(table[i][u].equals(new Integer(0)))
 					{
 						table[i][u] = table[i][currentColumn];
 						table[i][currentColumn] = 0;
@@ -138,15 +153,16 @@ public class Game2048 extends Observable implements KeyListener
 				int currentRow = i;
 				for(int u = i + 1 ; u < initialSize ; u++)
 				{
-					if(table[currentRow][j] == table[u][j])
+					if(table[currentRow][j].equals(table[u][j]))
 					{
 						table[currentRow][j] = 0;
 						table[u][j] *= 2;
+						score += table[i][u].intValue();
 						entries[u][j] = true;
 						entries[currentRow][j] = false;
 					}
 					else
-					if(table[u][j] == 0)
+					if(table[u][j].equals(new Integer(0)))
 					{
 						table[u][j] = table[currentRow][j];
 						table[currentRow][j] = 0;
@@ -174,15 +190,16 @@ public class Game2048 extends Observable implements KeyListener
 				int currentRow = i;
 				for(int u = i - 1 ; u >= 0 ; u--)
 				{
-					if(table[currentRow][j] == table[u][j])
+					if(table[currentRow][j].equals(table[u][j]))
 					{
 						table[currentRow][j] = 0;
 						table[u][j] *= 2;
+						score += table[i][u].intValue();
 						entries[u][j] = true;
 						entries[currentRow][j] = false;
 					}
 					else
-					if(table[u][j] == 0)
+					if(table[u][j].equals(new Integer(0)))
 					{
 						table[u][j] = table[currentRow][j];
 						table[currentRow][j] = 0;
@@ -252,29 +269,135 @@ public class Game2048 extends Observable implements KeyListener
 		}
 		return count;
 	}
+	public boolean moveUpPossible()
+	{
+		boolean[] flags = new boolean[initialSize];int counter = 0;
+		for(int j = 0 ; j < initialSize ; j++)
+		{
+			ArrayList<Integer> sequence = new ArrayList<Integer>();
+			for(int i = 0 ; i < initialSize ;i++) sequence.add(table[i][j]);
+			if(consecutiveNumbers(sequence) || zeroBetween(sequence)) flags[counter] = true;
+			else flags[counter] = false; counter++;
+		}
+		for(int count = 0 ; count < flags.length ; count++) if(flags[count] == true) return true;
+		return false;
+	}
+	public boolean moveDownPossible()
+	{
+		boolean[] flags = new boolean[initialSize];int counter = 0;
+		for(int j = 0 ; j < initialSize ; j++)
+		{
+			ArrayList<Integer> sequence = new ArrayList<Integer>();
+			for(int i = initialSize - 1 ; i >= 0 ; i--) sequence.add(table[i][j]);
+			if(consecutiveNumbers(sequence) || zeroBetween(sequence)) flags[counter] = true;
+			else flags[counter] = false; counter++;
+		}
+		for(int count = 0 ; count < flags.length ; count++) if(flags[count] == true) return true;
+		return false;
+	}
+	public boolean moveRightPossible()
+	{
+		boolean[] flags = new boolean[initialSize];int counter = 0;
+		for(int i = 0 ; i < initialSize ; i++)
+		{
+			ArrayList<Integer> sequence = new ArrayList<Integer>();
+			for(int j = initialSize - 1 ; j >= 0 ; j--) sequence.add(table[i][j]);
+			if(consecutiveNumbers(sequence) || zeroBetween(sequence)) flags[counter] = true;
+			else flags[counter] = false; counter++;
+		}
+		for(int count = 0 ; count < flags.length ; count++) if(flags[count] == true) return true;
+		return false;
+	}
+	public boolean moveLeftPossible()
+	{
+		boolean[] flags = new boolean[initialSize];int counter = 0;
+		for(int i = 0 ; i < initialSize ; i++)
+		{
+			ArrayList<Integer> sequence = new ArrayList<Integer>();
+			for(int j = 0 ; j < initialSize ; j++) sequence.add(table[i][j]);
+			if(consecutiveNumbers(sequence) || zeroBetween(sequence)) flags[counter] = true;
+			else flags[counter] = false; counter++;
+		}
+		for(int count = 0 ; count < flags.length ; count++) if(flags[count] == true) return true;
+		return false;
+	}
+	public boolean consecutiveNumbers(ArrayList<Integer> sequence)
+	{
+		for(int i = 1 ; i < sequence.size(); i++)
+		{
+			if(sequence.get(i-1).equals(sequence.get(i)) && 
+					!sequence.get(i).equals(new Integer(0))) return true;
+		}
+		return false;
+	}
+	public boolean zeroBetween(ArrayList<Integer> sequence)
+	{
+		boolean check = false;
+		for(int i = 0 ; i < sequence.size() ; i++)
+		{
+			if(!sequence.get(i).equals(new Integer(0))) check = true;
+		}
+		if(check==false) return false;
+		check = false;
+		if(sequence.get(0).equals(new Integer(0))) return true;
+		else
+		{
+			for(int i = 1 ; i < sequence.size(); i++)
+			{
+				if(sequence.get(i) .equals(new Integer(0))) check = true;
+				if(!sequence.get(i).equals(new Integer(0)) && check == true) return true;
+			}
+		}
+		return false;
+	}
+	public boolean checkEndGame()
+	{
+		if(!moveUpPossible() && !moveDownPossible() && !moveLeftPossible() && !moveRightPossible())
+			return true;
+		return false;
+	}
 	@Override
 	public void keyPressed(KeyEvent e) {
+		if(checkTyped && enabledInput)
+		{
 		if(e.getKeyCode() == KeyEvent.VK_UP)
 		{
+			if(moveUpPossible())
 			moveUp();
+			else
+			terminal.appendMessage("Move up is not possible");
+			terminal.appendMessage("Score is: " + score);
 		}
 		if(e.getKeyCode() == KeyEvent.VK_DOWN)
 		{
+			if(moveDownPossible())
 			moveDown();
+			else
+			terminal.appendMessage("Move down is not possible");
+			terminal.appendMessage("Score is: " + score);
 		}
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT)
 		{
+			if(moveRightPossible())
 			moveRight();
+			else
+			terminal.appendMessage("Move right is not possible");
+			terminal.appendMessage("Score is: " + score);
 		}
 		if(e.getKeyCode() == KeyEvent.VK_LEFT)
 		{
+			if(moveLeftPossible())
 			moveLeft();
+			else
+			terminal.appendMessage("Move left is not possible");
+			terminal.appendMessage("Score is: " + score);
 		}
+		}
+		checkTyped = false;
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
+		checkTyped = true;	
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {

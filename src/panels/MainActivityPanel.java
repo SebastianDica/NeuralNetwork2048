@@ -2,12 +2,16 @@ package panels;
 
 import game.Game2048;
 
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -16,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 public class MainActivityPanel extends JPanel implements Observer
 {
 	/**
@@ -52,9 +57,24 @@ public class MainActivityPanel extends JPanel implements Observer
 		add(inMind,BorderLayout.EAST);
 		setFocusable(true);
 		requestFocusInWindow();
+		setFocusTraversalKeysEnabled(false);
 		addKeyListener(game);
 		revalidate();
 		repaint();
+	}
+
+	public void up() {
+		try {
+			Robot bot = new Robot();
+			requestFocusInWindow();
+			bot.keyPress(KeyEvent.VK_UP);
+			requestFocusInWindow();
+			bot.keyRelease(KeyEvent.VK_UP);
+			requestFocusInWindow();
+		} catch (Exception e) {
+
+		}
+
 	}
 	public void mainView()
 	{

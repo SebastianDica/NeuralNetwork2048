@@ -30,9 +30,20 @@ public class GamePlayPanel extends JPanel
 				x = new JButton(table[i][j].toString());
 				else
 				x = new JButton();
-				x.setEnabled(false);
-				x.setBackground(new Color(20 + table[i][j]/8,20 + table[i][j]/8,20 + table[i][j]/8));
-				x.setForeground(new Color(10,10,10));
+				if(table[i][j] != 0)
+				{
+					x.setBackground(new Color(20 + 
+							(int)(Math.log(table[i][j].doubleValue())/Math.log(2.0d))*21,20 + 
+							(int)(Math.log(table[i][j].doubleValue())/Math.log(2.0d))*21,20 + 
+							(int)(Math.log(table[i][j].doubleValue())/Math.log(2.0d))*21));
+					if((Math.log(table[i][j].doubleValue())/Math.log(2.0d))<5)
+						x.setForeground(Color.WHITE);
+					else x.setForeground(Color.BLACK);
+				}
+				else
+				{
+					x.setBackground(new Color(20 ,20 ,20));
+				}
 				x.setFont(new Font(Font.MONOSPACED,Font.PLAIN,30));
 				add(x);
 			}
